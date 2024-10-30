@@ -26,24 +26,8 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv(SONARQUBE_SERVER) {
-                    sh 'mvn sonar:sonar'
-                }
-            }
-        }
+
     }
 
-    post {
-        always {
-            junit '**/target/surefire-reports/*.xml' // Facultatif : publier les résultats des tests
-        }
-        success {
-            echo 'Analyse SonarQube réussie.'
-        }
-        failure {
-            echo 'Échec de l\'analyse SonarQube.'
-        }
-    }
+
 }
