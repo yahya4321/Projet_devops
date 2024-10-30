@@ -38,7 +38,7 @@ pipeline {
             }
             steps {
                 withSonarQubeEnv('SonarQube_Server') { // Assurez-vous que le nom correspond à l'instance SonarQube configurée dans Jenkins
-                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=Projet_devops -Dsonar.sources=src -Dsonar.host.url=http://your_sonarqube_server_url -Dsonar.login=your_sonarqube_token"
+                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=Projet_devops -Dsonar.sources=src -Dsonar.host.url=http://192.168.50.4:9000 -Dsonar.login=sqp_3dacd87cd7e8ab4825e87c7a77e06027cb999d37"
                 }
             }
         }
