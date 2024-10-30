@@ -51,6 +51,7 @@ pipeline {
                        -Dsonar.projectKey=Projet_devops \
                        -Dsonar.sources=src \
                        -Dsonar.java.binaries=target/classes \
+                       -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
                        -Dsonar.host.url=http://192.168.50.4:9000 \
                        -Dsonar.login=sqp_3dacd87cd7e8ab4825e87c7a77e06027cb999d37
                    """
