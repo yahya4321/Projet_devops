@@ -31,6 +31,14 @@ pipeline {
                 sh 'mvn test' // Lancement des tests, y compris ceux utilisant Mockito
             }
         }
+             stage('Code Coverage') {
+                    steps {
+                        jacoco execPattern: 'target/jacoco.exec', // Locate JaCoCo report
+                               classPattern: 'target/classes',
+                               sourcePattern: 'src/main/java',
+                               exclusionPattern: '**/Test*.class' // Optional, exclude test classes
+                    }
+                }
 
        stage('SonarQube Analysis') {
            environment {
@@ -55,6 +63,8 @@ pipeline {
  post {
          always {
              junit '**/target/surefire-reports/*.xml' // Publication des résultats des tests JUnit
+             jacoco() // Publish JaCoCo coverage report
+
          }
 
          success {
