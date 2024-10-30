@@ -63,7 +63,7 @@ pipeline {
                  subject: "Jenkins Pipeline Success: ${currentBuild.fullDisplayName}",
                  body: """<p>The Jenkins pipeline for <b>${env.JOB_NAME}</b> completed successfully.</p>
                           <p>Build URL: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>""",
-                 to: 'yahyahamdi856@gmail.com' // Replace with the admin's email
+                 to: 'yahyaaahamdi8756@gmail.com' // Replace with the admin's email
              )
          }
 
@@ -73,7 +73,7 @@ pipeline {
                  subject: "Jenkins Pipeline Failure: ${currentBuild.fullDisplayName}",
                  body: """<p>The Jenkins pipeline for <b>${env.JOB_NAME}</b> failed.</p>
                           <p>Check the logs for more details: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>""",
-                 to: 'yahyahamdi856@gmail.com' // Replace with the admin's email
+                 to: 'yahyaaahamdi8756@gmail.com' // Replace with the admin's email
              )
          }
      }
