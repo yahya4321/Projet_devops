@@ -32,16 +32,24 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-            environment {
-                scannerHome = tool 'SonarQube Scanner' // Assurez-vous que "SonarQube Scanner" est le nom configuré pour SonarQube Scanner dans Jenkins
-            }
-            steps {
-                withSonarQubeEnv('SonarQube_Server') { // Assurez-vous que le nom correspond à l'instance SonarQube configurée dans Jenkins
-                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=Projet_devops -Dsonar.sources=src -Dsonar.host.url=http://192.168.50.4:9000 -Dsonar.login=sqp_3dacd87cd7e8ab4825e87c7a77e06027cb999d37"
-                }
-            }
-        }
+       stage('SonarQube Analysis') {
+           environment {
+               scannerHome = tool 'SonarQube Scanner' // Must match the tool name configured in Jenkins
+           }
+           steps {
+               withSonarQubeEnv('SonarQube_Server') { // Must match the configured SonarQube name in Jenkins
+                   sh """
+                       ${scannerHome}/bin/sonar-scanner \
+                       -Dsonar.projectKey=Projet_devops \
+                       -Dsonar.sources=src \
+                       -Dsonar.java.binaries=target/classes \
+                       -Dsonar.host.url=http://192.168.50.4:9000 \
+                       -Dsonar.login=sqp_3dacd87cd7e8ab4825e87c7a77e06027cb999d37
+                   """
+               }
+           }
+       }
+
     }
 
     post {
