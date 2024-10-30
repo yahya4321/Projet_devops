@@ -33,5 +33,12 @@ public class Bloc {
     @ToString.Exclude
     Set<Chambre> chambres = new HashSet<Chambre>();
 
+    public void setIdBloc(long idBloc) {
+        this.idBloc = idBloc;
+    }
+
+    public long getIdBloc() {
+        return idBloc;
+    }
 }
 
