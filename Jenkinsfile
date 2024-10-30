@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven' // Assurez-vous que Maven est installé et configuré dans Jenkins
-        jdk 'JDK11'  // Assurez-vous que JDK est installé et configuré dans Jenkins
+        maven 'M2_HOME' // Assurez-vous que Maven est installé et configuré dans Jenkins
+        jdk 'JAVA_HOME'  // Assurez-vous que JDK est installé et configuré dans Jenkins
     }
 
     environment {
