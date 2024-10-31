@@ -39,6 +39,16 @@ pipeline {
                               exclusionPattern: '**/Test*.class' // Optional, exclude test classes
                    }
                }
+               stage('Deploy to Nexus') {
+                          steps {
+                              script {
+                                  // Deploy the artifact to Nexus
+                                  withEnv(["PATH+MAVEN=${MAVEN_HOME}/bin"]) {
+                                      sh 'mvn deploy -s $HOME/.m2/settings.xml'
+                                  }
+                              }
+                          }
+                      }
 
        stage('SonarQube Analysis') {
            environment {
