@@ -60,7 +60,7 @@
          <plugin>
                 <groupId>org.sonarsource.scanner.maven</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>
-                <version>10.7.0.96327</version> <!-- Version explicite recommandée -->
+                <version>4.0.0.4121</version> <!-- Version explicite recommandée -->
             </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
