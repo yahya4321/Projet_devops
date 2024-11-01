@@ -42,7 +42,7 @@ pipeline {
          stage('Mockito Tests') {
                     steps {
                         // Exécution des tests unitaires Mockito avec Maven
-                        sh 'mvn test -Dtest=**/*Mockito*'
+                        sh 'mvn test '
                     }
                 }
 
