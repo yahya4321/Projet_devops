@@ -118,20 +118,21 @@ pipeline {
                                 }
                             }
 
-        stage('Deploy') {
-            steps {
-                script {
-                    sh """
-                    ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} << EOF
-                    cd ${REMOTE_PATH}
-                    sed -i 's|image: ${DOCKER_IMAGE}:.*|image: ${DOCKER_IMAGE}:${env.APP_VERSION}|' docker-compose.yml
-                    docker-compose pull
-                    docker-compose up -d --force-recreate
-                    EOF
-                    """
-                }
-            }
-        }
+       stage('Deploy') {
+           steps {
+               script {
+                   sh """
+                   ssh -o StrictHostKeyChecking=no -t ${REMOTE_USER}@${REMOTE_HOST} << EOF
+                   cd ${REMOTE_PATH}
+                   sed -i 's|image: ${DOCKER_IMAGE}:.*|image: ${DOCKER_IMAGE}:${env.APP_VERSION}|' docker-compose.yml
+                   /usr/bin/docker compose pull       # Using full path and 'docker compose' syntax
+                   /usr/bin/docker compose up -d --force-recreate
+                   EOF
+                   """
+               }
+           }
+       }
+
        }
 
  post {
