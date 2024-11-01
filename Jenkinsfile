@@ -55,7 +55,7 @@ pipeline {
         stage('Sonarqube') {
                     steps {
                         // Empaquetage de l'application Maven
-                        sh 'mvn Sonarqube'
+                        sh 'mvn sonar:sonar'
                     }
                 }
         stage('Clean') {
