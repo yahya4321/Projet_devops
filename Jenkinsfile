@@ -39,6 +39,12 @@ pipeline {
                 sh 'mvn clean compile'
             }
         }
+         stage('Mockito Tests') {
+                    steps {
+                        // Exécution des tests unitaires Mockito avec Maven
+                        sh 'mvn test -Dtest=**/*Mockito*'
+                    }
+                }
 
         stage('Test') {
             steps {
