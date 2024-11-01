@@ -52,6 +52,24 @@ pipeline {
                 sh 'mvn package'
             }
         }
+        stage('SONARQUBE') {
+                    steps {
+                        // Empaquetage de l'application Maven
+                        sh 'mvn SONARQUBE'
+                    }
+                }
+        stage('CLEAN') {
+                    steps {
+                        // Empaquetage de l'application Maven
+                        sh 'mvn CLEAN'
+                    }
+                }
+       stage('COMPILE') {
+                   steps {
+                       // Empaquetage de l'application Maven
+                       sh 'mvn COMPILE'
+                   }
+               }
     }
 
     post {
