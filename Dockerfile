@@ -5,7 +5,7 @@ FROM openjdk:11-jre-slim
 WORKDIR /app
 
 # Copy the JAR file from the build directory to the container
-COPY target/tp-foyer.jar app.jar
+COPY target/tp-foyer-5.5.0.jar app.jar
 
 # Run the JAR file
 ENTRYPOINT ["java", "-jar", "app.jar"]
