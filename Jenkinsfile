@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     tools {
-            maven 'M2_HOME'       // Assurez-vous que "M2_HOME" est le nom configuré pour Maven dans Jenkins
-            jdk 'JAVA_HOME'       // Assurez-vous que "JAVA_HOME" est le nom configuré pour JDK dans Jenkins
-        }
+        maven 'M2_HOME'       // Assurez-vous que "M2_HOME" est le nom configuré pour Maven dans Jenkins
+        jdk 'JAVA_HOME'       // Assurez-vous que "JAVA_HOME" est le nom configuré pour JDK dans Jenkins
+    }
 
     environment {
         GIT_URL = 'https://github.com/yahya4321/Projet_devops.git'
@@ -41,7 +41,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                // Exécution des tests unitaires avec Maven
+                // Exécution des tests unitaires avec Maven, y compris les tests Mockito
                 sh 'mvn test'
             }
         }
