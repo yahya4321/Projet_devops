@@ -129,6 +129,7 @@ pipeline {
                 // Connect to VM and run Docker Compose
                 sh """
                     ssh -o StrictHostKeyChecking=no vagrant@192.168.50.4 <<EOF
+                    export APP_VERSION=${env.APP_VERSION}
                     cd /home/vagrant/your-app-directory
                     /usr/bin/docker compose down
                     /usr/bin/docker compose up -d
