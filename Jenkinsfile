@@ -9,6 +9,8 @@ pipeline {
     environment {
         GIT_CREDENTIALS_ID = 'first_credentials' // Remplacez par l'ID de vos identifiants Git si l'authentification est nécessaire
         SONARQUBE_SERVER = 'SonarQube_Server'    // Nom de l'instance SonarQube configurée dans Jenkins
+        DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'   // Docker Hub credentials ID
+        DOCKER_IMAGE = 'yahya4321/tp-foyer'   // Docker image name on Docker Hub
     }
 
     stages {
@@ -67,9 +69,33 @@ pipeline {
                    """
                }
            }
-       }
 
-    }
+       }
+         stage('Build Docker Image') {
+                   steps {
+                       script {
+                           // Build Docker image using the Dockerfile
+                           sh "docker build -t ${DOCKER_IMAGE}:${env.BUILD_NUMBER} ."
+                       }
+                   }
+               }
+
+               stage('Push Docker Image to Docker Hub') {
+                   steps {
+                       script {
+                           // Log in to Docker Hub and push the image
+                           withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID,
+                                                            usernameVariable: 'DOCKERHUB_USERNAME',
+                                                            passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                               sh "echo ${DOCKERHUB_PASSWORD} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin"
+                               sh "docker push ${DOCKER_IMAGE}:${env.BUILD_NUMBER}"
+                               sh "docker logout"
+                           }
+                       }
+                   }
+               }
+
+       }
 
  post {
          always {
