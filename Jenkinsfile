@@ -21,6 +21,16 @@ pipeline {
                     credentialsId: 'first_credentials'
             }
         }
+              stage('Get Version') {
+                    steps {
+                        script {
+                            // Extract the version from the pom.xml and store it in an environment variable
+                            env.APP_VERSION = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
+                            echo "App version is: ${env.APP_VERSION}"
+                        }
+                    }
+                }
+
 
         stage('Build') {
             steps {
@@ -71,30 +81,28 @@ pipeline {
            }
 
        }
-         stage('Build Docker Image') {
-                   steps {
-                       script {
-                           // Build Docker image using the Dockerfile
-                           sh "docker build -t ${DOCKER_IMAGE}:${env.BUILD_NUMBER} ."
-                       }
-                   }
-               }
+          stage('Build Docker Image') {
+                    steps {
+                        script {
+                            // Build Docker image using the extracted version
+                            sh "docker build -t ${DOCKER_IMAGE}:${env.APP_VERSION} --build-arg JAR_FILE=tp-foyer-${env.APP_VERSION}.jar ."
+                        }
+                    }
+                }
 
                stage('Push Docker Image to Docker Hub') {
-                   steps {
-                       script {
-                           // Log in to Docker Hub and push the image
-                           withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID,
-                                                            usernameVariable: 'DOCKERHUB_USERNAME',
-                                                            passwordVariable: 'DOCKERHUB_PASSWORD')]) {
-                               sh "echo ${DOCKERHUB_PASSWORD} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin"
-                               sh "docker push ${DOCKER_IMAGE}:${env.BUILD_NUMBER}"
-                               sh "docker logout"
-                           }
-                       }
-                   }
-               }
-
+                        steps {
+                            script {
+                                withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID,
+                                                                 usernameVariable: 'DOCKERHUB_USERNAME',
+                                                                 passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                                    sh "echo ${DOCKERHUB_PASSWORD} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin"
+                                    sh "docker push ${DOCKER_IMAGE}:${env.APP_VERSION}"
+                                    sh "docker logout"
+                                }
+                            }
+                        }
+                    }
        }
 
  post {

@@ -4,8 +4,11 @@ FROM openjdk:11-jre-slim
 # Set the working directory
 WORKDIR /app
 
+# Define a build argument for the JAR file name
+ARG JAR_FILE
+
 # Copy the JAR file from the build directory to the container
-COPY target/tp-foyer-5.5.0.jar app.jar
+COPY target/${JAR_FILE} app.jar
 
 # Run the JAR file
 ENTRYPOINT ["java", "-jar", "app.jar"]
