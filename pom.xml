@@ -16,17 +16,13 @@
     <properties>
         <java.version>17</java.version>
     </properties>
-<<<<<<< HEAD
-    <distributionManagement>
-        <repository>
-            <id>deploymentRepo</id>
 
-=======
+
+
          <distributionManagement>
         <repository>
             <id>deploymentRepo</id>
             
->>>>>>> b5f735de2e6f01fe605863a7479f7b146c6a4250
             <url>http://localhost:8081/repository/maven-releases/</url>
         </repository>
     </distributionManagement>
@@ -81,11 +77,9 @@
 
     <build>
         <plugins>
-<<<<<<< HEAD
+
             <plugin> <groupId>org.sonarsource.scanner.maven</groupId> <artifactId>sonar-maven-plugin</artifactId> <version>4.0.0.4121</version> <!-- Version explicite recommandée --> </plugin>
-=======
            <plugin> <groupId>org.sonarsource.scanner.maven</groupId> <artifactId>sonar-maven-plugin</artifactId> <version>4.0.0.4121</version> <!-- Version explicite recommandée --> </plugin>
->>>>>>> b5f735de2e6f01fe605863a7479f7b146c6a4250
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
