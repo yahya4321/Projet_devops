@@ -126,8 +126,9 @@ pipeline {
                     ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} << 'EOF'
                     export APP_VERSION=${env.APP_VERSION}
                     cd ${REMOTE_PATH}
+                    echo "APP_VERSION=${env.APP_VERSION}" > .env  # Save APP_VERSION to an .env file Docker Compose reads
                     /usr/bin/docker compose down
-                    /usr/bin/docker compose up -d
+                    /usr/bin/docker compose up -d --env-file .env
 EOF
                     """
                 }
