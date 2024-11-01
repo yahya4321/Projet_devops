@@ -29,7 +29,7 @@ public class Etudiant {
 
     @ManyToMany(mappedBy = "etudiants")
     Set<Reservation> reservations;
-
+  //test
 }
 
 
