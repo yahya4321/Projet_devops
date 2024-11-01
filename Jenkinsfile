@@ -118,26 +118,27 @@ pipeline {
                                 }
                             }
 
-    stage('Deploy to VM') {
-        steps {
-            script {
-                // Copy docker-compose.yml file to VM
-                sh """
-                    scp -o StrictHostKeyChecking=no docker-compose.yml vagrant@192.168.50.4:/home/vagrant/your-app-directory/
-                """
+  stage('Deploy to VM') {
+      steps {
+          script {
+              // Copy docker-compose.yml file to VM
+              sh """
+                  scp -o StrictHostKeyChecking=no docker-compose.yml vagrant@192.168.50.4:/home/vagrant/your-app-directory/
+              """
 
-                // Connect to VM and run Docker Compose
-                sh """
-                    ssh -o StrictHostKeyChecking=no vagrant@192.168.50.4 <<EOF
-                    export APP_VERSION=${env.APP_VERSION}
-                    cd /home/vagrant/your-app-directory
-                    /usr/bin/docker compose down
-                    /usr/bin/docker compose up -d
-    EOF
-                """
-            }
-        }
-    }
+              // Connect to VM, set APP_VERSION, and run Docker Compose
+              sh """
+                  ssh -o StrictHostKeyChecking=no vagrant@192.168.50.4 << EOF
+                  export APP_VERSION=${env.APP_VERSION}
+                  cd /home/vagrant/your-app-directory
+                  /usr/bin/docker compose down
+                  /usr/bin/docker compose up -d
+  EOF
+              """
+          }
+      }
+  }
+
 
 
        }
