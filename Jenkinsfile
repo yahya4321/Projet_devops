@@ -118,20 +118,26 @@ pipeline {
                                 }
                             }
 
-       stage('Deploy') {
-           steps {
-               script {
-                   sh """
-                   ssh -o StrictHostKeyChecking=no -t ${REMOTE_USER}@${REMOTE_HOST} << EOF
-                   cd ${REMOTE_PATH}
-                   sed -i 's|image: ${DOCKER_IMAGE}:.*|image: ${DOCKER_IMAGE}:${env.APP_VERSION}|' docker-compose.yml
-                   /usr/bin/docker compose pull       # Using full path and 'docker compose' syntax
-                   /usr/bin/docker compose up -d --force-recreate
-                   EOF
-                   """
-               }
-           }
-       }
+    stage('Deploy to VM') {
+        steps {
+            script {
+                // Copy docker-compose.yml file to VM
+                sh """
+                    scp -o StrictHostKeyChecking=no docker-compose.yml vagrant@192.168.50.4:/home/vagrant/your-app-directory/
+                """
+
+                // Connect to VM and run Docker Compose
+                sh """
+                    ssh -o StrictHostKeyChecking=no vagrant@192.168.50.4 <<EOF
+                    cd /home/vagrant/your-app-directory
+                    /usr/bin/docker compose down
+                    /usr/bin/docker compose up -d
+    EOF
+                """
+            }
+        }
+    }
+
 
        }
 
