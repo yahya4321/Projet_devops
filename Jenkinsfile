@@ -10,6 +10,7 @@ pipeline {
         GIT_URL = 'https://github.com/yahya4321/Projet_devops.git'
         GIT_BRANCH = 'Firas_Univer'
         CREDENTIALS_ID = 'GitHub_Credentials'
+        SONAR_TOKEN = credentials('sonar_token')
     }
 
     stages {
