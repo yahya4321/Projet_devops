@@ -6,12 +6,15 @@ pipeline {
         jdk 'JAVA_HOME'       // Assurez-vous que "JAVA_HOME" est le nom configuré pour JDK dans Jenkins
     }
 
-    environment {
-        GIT_CREDENTIALS_ID = 'first_credentials' // Remplacez par l'ID de vos identifiants Git si l'authentification est nécessaire
-        SONARQUBE_SERVER = 'SonarQube_Server'    // Nom de l'instance SonarQube configurée dans Jenkins
-        DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'   // Docker Hub credentials ID
-        DOCKER_IMAGE = 'yahya4321/tp-foyer'   // Docker image name on Docker Hub
-    }
+     environment {
+          GIT_CREDENTIALS_ID = 'first_credentials'
+          SONARQUBE_SERVER = 'SonarQube_Server'
+          DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
+          DOCKER_IMAGE = 'yahya4321/tp-foyer'
+          REMOTE_HOST = '192.168.50.4'   // VM IP address
+          REMOTE_USER = 'vagrant'         // VM SSH user
+          REMOTE_PATH = '/home/vagrant/your-app-directory'  // Directory to store docker-compose.yml on the VM
+      }
 
     stages {
         stage('Checkout Code') {
@@ -103,6 +106,32 @@ pipeline {
                             }
                         }
                     }
+                    stage('Setup Remote Directory and Upload Docker Compose') {
+                                steps {
+                                    script {
+                                        // Create the directory and copy docker-compose.yml to the VM
+                                        sh """
+                                        ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} 'mkdir -p ${REMOTE_PATH}'
+                                        scp -o StrictHostKeyChecking=no docker-compose.yml ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/docker-compose.yml
+                                        """
+                                    }
+                                }
+                            }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} << EOF
+                    cd ${REMOTE_PATH}
+                    sed -i 's|image: ${DOCKER_IMAGE}:.*|image: ${DOCKER_IMAGE}:${env.APP_VERSION}|' docker-compose.yml
+                    docker-compose pull
+                    docker-compose up -d --force-recreate
+                    EOF
+                    """
+                }
+            }
+        }
        }
 
  post {
