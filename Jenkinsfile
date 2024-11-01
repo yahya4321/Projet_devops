@@ -41,7 +41,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                // Exécution des tests unitaires avec Maven, y compris les tests Mockito
+                // Exécution des tests unitaires avec Maven
                 sh 'mvn test'
             }
         }
@@ -52,24 +52,27 @@ pipeline {
                 sh 'mvn package'
             }
         }
-        stage('Sonarqube') {
-                    steps {
-                        // Empaquetage de l'application Maven
-                        sh 'mvn sonar:sonar'
-                    }
-                }
+
+        stage('SonarQube Analysis') {
+            steps {
+                // Analyse SonarQube
+                sh 'mvn sonar:sonar'
+            }
+        }
+
         stage('Clean') {
-                    steps {
-                        // Empaquetage de l'application Maven
-                        sh 'mvn Clean'
-                    }
-                }
-       stage('Compile') {
-                   steps {
-                       // Empaquetage de l'application Maven
-                       sh 'mvn Compile'
-                   }
-               }
+            steps {
+                // Nettoyage du projet Maven
+                sh 'mvn clean'
+            }
+        }
+
+        stage('Compile') {
+            steps {
+                // Compilation du projet Maven
+                sh 'mvn compile'
+            }
+        }
     }
 
     post {
