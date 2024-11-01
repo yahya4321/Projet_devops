@@ -52,22 +52,22 @@ pipeline {
                 sh 'mvn package'
             }
         }
-        stage('SONARQUBE') {
+        stage('Sonarqube') {
                     steps {
                         // Empaquetage de l'application Maven
-                        sh 'mvn SONARQUBE'
+                        sh 'mvn Sonarqube'
                     }
                 }
-        stage('CLEAN') {
+        stage('Clean') {
                     steps {
                         // Empaquetage de l'application Maven
-                        sh 'mvn CLEAN'
+                        sh 'mvn Clean'
                     }
                 }
-       stage('COMPILE') {
+       stage('Compile') {
                    steps {
                        // Empaquetage de l'application Maven
-                       sh 'mvn COMPILE'
+                       sh 'mvn Compile'
                    }
                }
     }
