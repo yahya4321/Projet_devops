@@ -3,28 +3,25 @@ name: CI Pipeline
 on:
   push:
     branches:
-      - Adam_branch  # Trigger the action only for Adam_branch
+      - Adam_branch
   pull_request:
     branches:
       - Adam_branch
 
 jobs:
-  git_clone:
+  build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          ref: Adam_branch  # Specify the Adam_branch
-          fetch-depth: 1    # Clone only the latest commit to speed up the process
+          ref: Adam_branch  # Cela indique explicitement de récupérer la branche Adam_branch
 
-      - name: Set up JDK 17
+      - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: '17'
+          java-version: '11' # Remplace par ta version de Java
 
       - name: Build with Maven
         run: mvn clean install
-
-      - name: Run Tests
-        run: mvn test
