@@ -41,26 +41,30 @@ pipeline {
                 sh 'mvn clean compile'
             }
         }
-         stage('Docker Build and Push') {
-             steps {
-                 script {
-                     // Construire l'image Docker en utilisant le fichier Dockerfile
-                     def jarFile = sh(script: "ls target/*.jar | head -n 1", returnStdout: true).trim()
-                     def imageName = "${env.DOCKER_IMAGE_NAME}:${env.APP_VERSION}"
-
-                     // Construire l'image Docker en passant le fichier JAR en tant qu'argument
-                     sh "docker build --build-arg JAR_FILE=${jarFile} -t ${imageName} ."
-
-                     // Connexion au registre Docker
-                     withCredentials([usernamePassword(credentialsId: "${env.DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                         sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
+         stage('Verify JAR File') {
+                     steps {
+                         script {
+                             sh 'ls -l target/*.jar || echo "No JAR file found"'
+                         }
                      }
-
-                     // Pousser l'image Docker vers le registre
-                     sh "docker push ${imageName}"
                  }
-             }
-         }
+
+                 stage('Docker Build and Push') {
+                     steps {
+                         script {
+                             def jarFile = sh(script: "ls target/*.jar | head -n 1", returnStdout: true).trim()
+                             def imageName = "${env.DOCKER_IMAGE_NAME}:${env.APP_VERSION}"
+
+                             sh "docker build --build-arg JAR_FILE=${jarFile} -t ${imageName} ."
+
+                             withCredentials([usernamePassword(credentialsId: "${env.DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                                 sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
+                             }
+
+                             sh "docker push ${imageName}"
+                         }
+                     }
+                 }
 
          stage('Mockito Tests') {
                     steps {
