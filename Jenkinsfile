@@ -84,7 +84,7 @@ pipeline {
                   steps {
                       script {
                           // Injecter la version dans docker-compose.yml
-                          sh "sed -i 's/\\${APP_VERSION}/${env.APP_VERSION}/g' docker-compose.yml"
+                          sh "sed -i 's/\\\${APP_VERSION}/${env.APP_VERSION}/g' docker-compose.yml"
 
                           // Valider la configuration avant le déploiement
                           sh "docker-compose -f docker-compose.yml config"
