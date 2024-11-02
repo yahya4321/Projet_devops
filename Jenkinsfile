@@ -83,6 +83,9 @@ pipeline {
       stage('Deploy with Docker Compose') {
           steps {
               script {
+                  // Vérifier le répertoire courant
+                  sh "echo 'Répertoire courant : ' && pwd"
+
                   // Vérifier que docker-compose.yml est présent
                   sh "ls -l docker-compose.yml || echo 'docker-compose.yml introuvable' && exit 1"
 
@@ -97,6 +100,7 @@ pipeline {
               }
           }
       }
+
 
 
         stage('Mockito Tests') {
