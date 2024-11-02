@@ -12,7 +12,7 @@ pipeline {
         CREDENTIALS_ID = 'GitHub_Credentials'
         SONAR_TOKEN = credentials('sonar_token')
         DOCKER_CREDENTIALS_ID = 'Docker_Credentials'
-        DOCKER_IMAGE_NAME = 'firaskdidi/projetdevops/alpine' // Include Docker Hub username
+        DOCKER_IMAGE_NAME = 'firaskdidi/projetdevops/alpine'
     }
 
     stages {
@@ -60,18 +60,21 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    // Log in to Docker Hub
-                    withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
-                        // Push the image to the Docker registry
-                        sh "docker push ${DOCKER_IMAGE_NAME}:${env.APP_VERSION}"
-                    }
-                }
-            }
-        }
+       stage('Push Image to Hub') {
+           steps {
+               script {
+                   // Use credentials for Docker Hub login
+                   withCredentials([usernamePassword(credentialsId: 'Docker_Credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                       // Log in to Docker Hub
+                       sh "echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin"
+
+                       // Push the image to Docker Hub
+                       sh "docker push firaskdidi/projetdevops/alpine:${env.APP_VERSION}"
+                   }
+               }
+           }
+       }
+
 
         stage('Mockito Tests') {
             steps {
