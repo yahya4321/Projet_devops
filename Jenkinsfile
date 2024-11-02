@@ -48,27 +48,13 @@ pipeline {
                          }
                      }
                  }
-
-               stage('Docker Build and Push') {
-                   steps {
-                       script {
-                           // Récupérer le fichier JAR généré dans le répertoire target
-                           def jarFile = sh(script: "ls target/*.jar | head -n 1", returnStdout: true).trim()
-                           def imageName = "${env.DOCKER_IMAGE_NAME}:${env.APP_VERSION}"
-
-                           // Construire l'image Docker en passant le chemin du fichier JAR comme argument
-                           sh "docker build --build-arg JAR_FILE=${jarFile} -t ${imageName} ."
-
-                           // Connexion et push vers Docker Hub
-                           withCredentials([usernamePassword(credentialsId: "${env.DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                               sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
-                           }
-
-                           // Pousser l'image Docker vers le registre
-                           sh "docker push ${imageName}"
-                       }
-                   }
-               }
+             stage('Build Docker Image') {
+                     steps {
+                         script {
+                             sh "docker build -t ${DOCKER_IMAGE}:${env.APP_VERSION} --build-arg JAR_FILE=tp-foyer-${env.APP_VERSION}.jar ."
+                         }
+                     }
+                 }
 
 
          stage('Mockito Tests') {
