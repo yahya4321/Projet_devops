@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     tools {
-        maven 'M2_HOME'       // Assurez-vous que "M2_HOME" est le nom configuré pour Maven dans Jenkins
-        jdk 'JAVA_HOME'       // Assurez-vous que "JAVA_HOME" est le nom configuré pour JDK dans Jenkins
+        maven 'M2_HOME'       // Ensure "M2_HOME" is configured in Jenkins
+        jdk 'JAVA_HOME'       // Ensure "JAVA_HOME" is configured in Jenkins
     }
 
     environment {
@@ -18,7 +18,6 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                // Cloner le dépôt depuis la branche spécifiée en utilisant les identifiants
                 git branch: "${env.GIT_BRANCH}",
                     url: "${env.GIT_URL}",
                     credentialsId: "${env.CREDENTIALS_ID}"
@@ -28,7 +27,6 @@ pipeline {
         stage('Get Version') {
             steps {
                 script {
-                    // Extraire la version du fichier pom.xml et la stocker dans une variable d'environnement
                     env.APP_VERSION = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
                     echo "Application version: ${env.APP_VERSION}"
                 }
@@ -37,72 +35,47 @@ pipeline {
 
         stage('Build') {
             steps {
-                // Compilation du projet Maven
-                sh 'mvn clean compile'
+                sh 'mvn clean package'  // This will compile and package the JAR
             }
         }
-         stage('Verify JAR File') {
-                     steps {
-                         script {
-                             sh 'ls -l target/*.jar || echo "No JAR file found"'
-                         }
-                     }
-                 }
+
+        stage('Verify JAR File') {
+            steps {
+                script {
+                    sh 'ls -l target/*.jar || echo "No JAR file found"'
+                }
+            }
+        }
 
         stage('Build Docker Image') {
-                    steps {
-                        script {
-                            sh "docker build -t ${DOCKER_IMAGE_NAME}:${env.APP_VERSION} --build-arg JAR_FILE=tp-foyer-${env.APP_VERSION}.jar ."
-                        }
-                    }
-                }
-
-         stage('Mockito Tests') {
-                    steps {
-                        // Exécution des tests unitaires Mockito avec Maven
-                        sh 'mvn test '
-                    }
-                }
-
-        stage('Test') {
             steps {
-                // Exécution des tests unitaires avec Maven
-                sh 'mvn test'
+                script {
+                    sh "docker build -t ${DOCKER_IMAGE_NAME}:${env.APP_VERSION} --build-arg JAR_FILE=tp-foyer-${env.APP_VERSION}.jar ."
+                }
             }
         }
 
-        stage('Package') {
+        stage('Mockito Tests') {
             steps {
-                // Empaquetage de l'application Maven
-                sh 'mvn package'
+                sh 'mvn test '
             }
         }
 
         stage('SonarQube Analysis') {
             steps {
-                // Analyse SonarQube
                 sh 'mvn sonar:sonar'
             }
         }
 
         stage('Clean') {
             steps {
-                // Nettoyage du projet Maven
                 sh 'mvn clean'
-            }
-        }
-
-        stage('Compile') {
-            steps {
-                // Compilation du projet Maven
-                sh 'mvn compile'
             }
         }
     }
 
     post {
         always {
-            // Archive les artefacts de build (par exemple, fichiers JAR ou WAR) pour les récupérer dans Jenkins
             archiveArtifacts artifacts: 'target/*.jar', allowEmptyArchive: true
         }
         success {
