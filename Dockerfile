@@ -1,5 +1,14 @@
+# Use an official OpenJDK runtime as the base image
 FROM openjdk:17-jdk-alpine
-ARG JAR_FILE
+
+# Set the working directory
 WORKDIR /app
-COPY ${JAR_FILE} app.jar
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+
+# Define a build argument for the JAR file name
+ARG JAR_FILE
+
+# Copy the JAR file from the build directory to the container
+COPY target/${JAR_FILE} app.jar
+
+# Run the JAR file
+ENTRYPOINT ["java", "-jar", "app.jar"]
