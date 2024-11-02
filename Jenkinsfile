@@ -80,20 +80,24 @@ pipeline {
               }
           }
       }
-       stage('Deploy with Docker Compose') {
-                  steps {
-                      script {
-                          // Injecter la version dans docker-compose.yml
-                          sh "sed -i 's/\\\${APP_VERSION}/${env.APP_VERSION}/g' docker-compose.yml"
+      stage('Deploy with Docker Compose') {
+          steps {
+              script {
+                  // Vérifier que docker-compose.yml est présent
+                  sh "ls -l docker-compose.yml || echo 'docker-compose.yml introuvable' && exit 1"
 
-                          // Valider la configuration avant le déploiement
-                          sh "docker-compose -f docker-compose.yml config"
+                  // Injecter la version dans docker-compose.yml
+                  sh "sed -i 's/\\\${APP_VERSION}/${env.APP_VERSION}/g' docker-compose.yml"
 
-                          // Démarrer les services avec Docker Compose
-                          sh "docker-compose -f docker-compose.yml up -d"
-                      }
-                  }
+                  // Valider la configuration avant le déploiement
+                  sh "docker-compose -f docker-compose.yml config"
+
+                  // Démarrer les services avec Docker Compose
+                  sh "docker-compose -f docker-compose.yml up -d"
               }
+          }
+      }
+
 
         stage('Mockito Tests') {
             steps {
