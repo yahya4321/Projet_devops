@@ -12,7 +12,7 @@ pipeline {
         CREDENTIALS_ID = 'GitHub_Credentials'
         SONAR_TOKEN = credentials('sonar_token')
         DOCKER_CREDENTIALS_ID = 'Docker_Credentials'
-        DOCKER_IMAGE_NAME = 'projetdevops/alpine'
+        DOCKER_IMAGE_NAME = 'firaskdidi/projetdevops'
     }
 
     stages {
@@ -60,24 +60,26 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image to Docker Hub') {
-            steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'Docker_Credentials',
-                                                     usernameVariable: 'DOCKERHUB_USERNAME',
-                                                     passwordVariable: 'DOCKERHUB_PASSWORD')]) {
-                        // Log in to Docker Hub
-                        sh "echo ${DOCKERHUB_PASSWORD} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin"
+      stage('Push Docker Image to Docker Hub') {
+          steps {
+              script {
+                  withCredentials([usernamePassword(credentialsId: 'Docker_Credentials',
+                                                   usernameVariable: 'DOCKERHUB_USERNAME',
+                                                   passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                      // Log in to Docker Hub sans utiliser d'interpolation de chaînes
+                      sh '''
+                          echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+                      '''
 
-                        // Push the image to Docker Hub
-                        sh "docker push ${DOCKER_IMAGE_NAME}:${env.APP_VERSION}"
+                      // Poussez l'image dans Docker Hub
+                      sh "docker push ${DOCKER_IMAGE_NAME}:${env.APP_VERSION}"
 
-                        // Log out from Docker Hub
-                        sh "docker logout"
-                    }
-                }
-            }
-        }
+                      // Déconnexion de Docker Hub
+                      sh "docker logout"
+                  }
+              }
+          }
+      }
 
         stage('Mockito Tests') {
             steps {
