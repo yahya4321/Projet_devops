@@ -48,13 +48,27 @@ pipeline {
                          }
                      }
                  }
-             stage('Build Docker Image') {
-                     steps {
-                         script {
-                             sh "docker build -t ${DOCKER_IMAGE}:${env.APP_VERSION} --build-arg JAR_FILE=tp-foyer-${env.APP_VERSION}.jar ."
+              stage('Build Docker Image') {
+                         steps {
+                             script {
+                                 // Construire l'image Docker en utilisant le fichier JAR
+                                 sh "docker build -t ${DOCKER_IMAGE_NAME}:${env.APP_VERSION} --build-arg JAR_FILE=target/tp-foyer-${env.APP_VERSION}.jar ."
+                             }
                          }
                      }
-                 }
+
+              stage('Push Docker Image') {
+                          steps {
+                              script {
+                                  // Connexion et push vers Docker Hub
+                                  withCredentials([usernamePassword(credentialsId: "${env.DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                                      sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
+                                  }
+                                  sh "docker push ${DOCKER_IMAGE_NAME}:${env.APP_VERSION}"
+                              }
+                          }
+                      }
+                  }
 
 
          stage('Mockito Tests') {
