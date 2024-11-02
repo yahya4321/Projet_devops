@@ -60,24 +60,28 @@ pipeline {
             }
         }
 
-      stage('Push Docker Image to Docker Hub') {
-          steps {
-              script {
-                  withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}",
-                                                   usernameVariable: 'DOCKERHUB_USERNAME',
-                                                   passwordVariable: 'DOCKERHUB_PASSWORD')]) {
-                      // Log in to Docker Hub
-                      sh "echo ${DOCKERHUB_PASSWORD} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin"
+     stage('Push Docker Image to Docker Hub') {
+         steps {
+             script {
+                 withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}",
+                                                  usernameVariable: 'DOCKERHUB_USERNAME',
+                                                  passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                     // Affiche le nom d'utilisateur pour vérifier les credentials
+                     echo "Attempting Docker login with user: ${DOCKERHUB_USERNAME}"
 
-                      // Push the image to Docker Hub
-                      sh "docker push ${DOCKER_IMAGE_NAME}:${env.APP_VERSION}"
+                     // Log in to Docker Hub
+                     sh "echo ${DOCKERHUB_PASSWORD} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin"
 
-                      // Log out from Docker Hub
-                      sh "docker logout"
-                  }
-              }
-          }
-      }
+                     // Push the image to Docker Hub
+                     sh "docker push ${DOCKER_IMAGE_NAME}:${env.APP_VERSION}"
+
+                     // Log out from Docker Hub
+                     sh "docker logout"
+                 }
+             }
+         }
+     }
+
 
 
 
