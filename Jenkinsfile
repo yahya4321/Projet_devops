@@ -7,11 +7,12 @@ pipeline {
     }
 
     environment {
-        GIT_URL = 'https://github.com/your-repo/project.git'  // Replace with your Git repo
-        GIT_BRANCH = 'main'                                   // Replace with your branch
-        CREDENTIALS_ID = 'GitHub_Credentials'                 // Git credentials ID
-        DOCKER_CREDENTIALS_ID = 'Docker_Credentials'          // Docker credentials ID
-        DOCKER_IMAGE_NAME = 'firaskdidi/projetdevops/alpine'  // Docker Hub image name
+        GIT_URL = 'https://github.com/yahya4321/Projet_devops.git'
+        GIT_BRANCH = 'Firas_Univer'
+        CREDENTIALS_ID = 'GitHub_Credentials'
+        SONAR_TOKEN = credentials('sonar_token')
+        DOCKER_CREDENTIALS_ID = 'Docker_Credentials'
+        DOCKER_IMAGE_NAME = 'firaskdidi/projetdevops/alpine'
     }
 
     stages {
@@ -23,47 +24,86 @@ pipeline {
             }
         }
 
-        stage('Build Application') {
+        stage('Get Version') {
             steps {
-                sh 'mvn clean package'  // Adjust as per your build tool
+                script {
+                    env.APP_VERSION = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
+                    echo "Application version: ${env.APP_VERSION}"
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'  // This will compile and package the JAR
+            }
+        }
+
+        stage('Verify JAR File') {
+            steps {
+                script {
+                    def jarFile = sh(script: 'ls -1 target/*.jar', returnStdout: true).trim()
+                    if (!jarFile) {
+                        error("No JAR file found!")
+                    } else {
+                        echo "JAR file found: ${jarFile}"
+                    }
+                }
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build Docker image with a version tag
-                    env.APP_VERSION = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
-                    sh "docker build -t ${DOCKER_IMAGE_NAME}:${env.APP_VERSION} ."
+                    sh "docker build -t ${DOCKER_IMAGE_NAME}:${env.APP_VERSION} --build-arg JAR_FILE=tp-foyer-${env.APP_VERSION}.jar ."
                 }
             }
         }
 
-        stage('Push Docker Image to Docker Hub') {
+      stage('Push Docker Image to Docker Hub') {
+          steps {
+              script {
+                  withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}",
+                                                   usernameVariable: 'DOCKERHUB_USERNAME',
+                                                   passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                      // Log in to Docker Hub
+                      sh "echo ${DOCKERHUB_PASSWORD} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin"
+
+                      // Push the image to Docker Hub
+                      sh "docker push ${DOCKER_IMAGE_NAME}:${env.APP_VERSION}"
+
+                      // Log out from Docker Hub
+                      sh "docker logout"
+                  }
+              }
+          }
+      }
+
+
+
+
+        stage('Mockito Tests') {
             steps {
-                script {
-                    // Use credentials for Docker Hub login
-                    withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}",
-                                                     usernameVariable: 'DOCKERHUB_USERNAME',
-                                                     passwordVariable: 'DOCKERHUB_PASSWORD')]) {
-                        // Log in to Docker Hub
-                        sh "echo ${DOCKERHUB_PASSWORD} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin"
+                sh 'mvn test'
+            }
+        }
 
-                        // Push the image to Docker Hub
-                        sh "docker push ${DOCKER_IMAGE_NAME}:${env.APP_VERSION}"
+        stage('SonarQube Analysis') {
+            steps {
+                sh 'mvn sonar:sonar'
+            }
+        }
 
-                        // Log out from Docker Hub
-                        sh "docker logout"
-                    }
-                }
+        stage('Clean') {
+            steps {
+                sh 'mvn clean'
             }
         }
     }
 
     post {
         always {
-            echo 'Pipeline execution completed.'
-            cleanWs()  // Clean up workspace
+            archiveArtifacts artifacts: 'target/*.jar', allowEmptyArchive: true
         }
         success {
             echo 'Pipeline executed successfully!'
