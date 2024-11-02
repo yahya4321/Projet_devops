@@ -12,7 +12,7 @@ pipeline {
         CREDENTIALS_ID = 'GitHub_Credentials'
         SONAR_TOKEN = credentials('sonar_token')
         DOCKER_CREDENTIALS_ID = 'Docker_Credentials'
-        DOCKER_IMAGE_NAME = 'projetdevops/alpine'
+        DOCKER_IMAGE_NAME = 'firaskdidi/projetdevops/alpine'
     }
 
     stages {
