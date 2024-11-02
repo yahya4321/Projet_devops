@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_container
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - tpfoyer_network
+
+  tpfoyer-app:
+    image: yassin349/tp-foyer:1.0.0
+    container_name: tpfoyer_container
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: rootpassword
+    ports:
+      - "8089:8089"
+    depends_on:
+      - mysql
+    networks:
+      - tpfoyer_network
+
+volumes:
+  mysql_data:
+
+networks:
+  tpfoyer_network:
