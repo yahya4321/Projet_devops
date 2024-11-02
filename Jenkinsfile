@@ -17,6 +17,12 @@ pipeline {
     }
 
     stages {
+
+        stage('Clean Workspace') {
+                           steps {
+                               cleanWs() // Jenkins built-in function to clean workspace
+                           }
+        }
         stage('Checkout Code') {
             steps {
                 git branch: 'Yahya_Branch_Bloc',
