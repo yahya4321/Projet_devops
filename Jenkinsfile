@@ -139,15 +139,23 @@ EOF
                 }
             }
         }
-        stage('Monitor with Prometheus and Grafana') {
+        stage('Deploy Prometheus and Grafana') {
             steps {
                 script {
-                    sh """
-                        docker compose -f docker-compose.yml up -d prometheus grafana
-                    """
+                    // Stop and remove existing containers
+                    sh '''
+                    docker stop prometheus_container || true
+                    docker rm prometheus_container || true
+                    docker stop grafana_container || true
+                    docker rm grafana_container || true
+
+                    // Start containers with Docker Compose
+                    docker compose -f docker-compose.yml up -d prometheus grafana
+                    '''
                 }
             }
         }
+
 
     }
 
