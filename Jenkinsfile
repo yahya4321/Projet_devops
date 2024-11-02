@@ -12,7 +12,7 @@ pipeline {
         CREDENTIALS_ID = 'GitHub_Credentials'
         SONAR_TOKEN = credentials('sonar_token')
         DOCKER_CREDENTIALS_ID = 'Docker_Credentials'
-        DOCKER_IMAGE_NAME = 'firaskdidi/projetdevops'
+        DOCKER_IMAGE_NAME = 'projetdevops/alpine'
     }
 
     stages {
@@ -60,53 +60,24 @@ pipeline {
             }
         }
 
-      stage('Push Docker Image to Docker Hub') {
-          steps {
-              script {
-                  withCredentials([usernamePassword(credentialsId: 'Docker_Credentials',
-                                                   usernameVariable: 'DOCKERHUB_USERNAME',
-                                                   passwordVariable: 'DOCKERHUB_PASSWORD')]) {
-                      // Log in to Docker Hub sans utiliser d'interpolation de chaînes
-                      sh '''
-                          echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-                      '''
+        stage('Push Docker Image to Docker Hub') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'Docker_Credentials',
+                                                     usernameVariable: 'DOCKERHUB_USERNAME',
+                                                     passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                        // Log in to Docker Hub
+                        sh "echo ${DOCKERHUB_PASSWORD} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin"
 
-                      // Poussez l'image dans Docker Hub
-                      sh "docker push ${DOCKER_IMAGE_NAME}:${env.APP_VERSION}"
+                        // Push the image to Docker Hub
+                        sh "docker push ${DOCKER_IMAGE_NAME}:${env.APP_VERSION}"
 
-                      // Déconnexion de Docker Hub
-                      sh "docker logout"
-                  }
-              }
-          }
-      }
-
-       stage('Deploy with Docker Compose') {
-                  steps {
-                      script {
-                          // Remplacer le tag dans le fichier docker-compose avec le tag actuel
-                          sh "sed -i 's/\\${TAG}/${TAG}/g' docker-compose.yml"
-
-                          // Démarrer les services définis dans le fichier docker-compose.yml
-                          sh "docker-compose -f docker-compose.yml up -d"
-                      }
-                  }
-              }
-          }
-
-          stage('Deploy with Docker Compose') {
-                      steps {
-                          script {
-                              // Injecter la version dans docker-compose.yml
-                              sh "sed -i 's/\\${APP_VERSION}/${env.APP_VERSION}/g' docker-compose.yml"
-
-                              // Valider la configuration avant le déploiement
-                              sh "docker-compose -f docker-compose.yml config"
-
-                              // Démarrer les services avec Docker Compose
-                              sh "docker-compose -f docker-compose.yml up -d"
-                          }
-                      }
+                        // Log out from Docker Hub
+                        sh "docker logout"
+                    }
+                }
+            }
+        }
 
         stage('Mockito Tests') {
             steps {
