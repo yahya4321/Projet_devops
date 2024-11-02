@@ -11,7 +11,7 @@ pipeline {
         GIT_BRANCH = 'Firas_Univer'
         CREDENTIALS_ID = 'GitHub_Credentials'
         SONAR_TOKEN = credentials('sonar_token')
-        DOCKER_CREDENTIALS_ID = 'Docker Credentials	'
+        DOCKER_CREDENTIALS_ID = 'Docker_Credentials	'
         DOCKER_IMAGE_NAME = 'projetdevops/alpine'
     }
 
@@ -59,7 +59,7 @@ pipeline {
             steps {
                 script {
                     // Log in to Docker Hub
-                    withCredentials([usernamePassword(credentialsId: 'Docker Credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: 'Docker_Credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                         sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
                         // Push the image to the Docker registry
                         sh "docker push ${DOCKER_IMAGE_NAME}:${env.APP_VERSION}"
