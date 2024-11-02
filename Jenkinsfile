@@ -52,7 +52,7 @@ pipeline {
         stage('Build Docker Image') {
                     steps {
                         script {
-                            sh "docker build -t ${DOCKER_IMAGE_NAME}:${env.APP_VERSION} --build-arg JAR_FILE=tp-foyer-${env.APP_VERSION}.jar ."
+                            sh "docker build -t ${DOCKER_IMAGE_NAME}:${env.APP_VERSION} --build-arg JAR_FILE=Projet_devops-${env.APP_VERSION}.jar ."
                         }
                     }
                 }
