@@ -81,25 +81,14 @@ pipeline {
           }
       }
       stage('Deploy with Docker Compose') {
-          steps {
-              script {
-                  // Vérifier le répertoire courant
-                  sh "echo 'Répertoire courant : ' && pwd"
-
-                  // Vérifier que docker-compose.yml est présent
-                  sh "ls -l docker-compose.yml || echo 'docker-compose.yml introuvable' && exit 1"
-
-                  // Injecter la version dans docker-compose.yml
-                  sh "sed -i 's/\\\${APP_VERSION}/${env.APP_VERSION}/g' docker-compose.yml"
-
-                  // Valider la configuration avant le déploiement
-                  sh "docker-compose -f docker-compose.yml config"
-
-                  // Démarrer les services avec Docker Compose
-                  sh "docker-compose -f docker-compose.yml up -d"
+                  steps {
+                      script {
+                          echo 'Deploying application using Docker Compose...'
+                          sh 'docker-compose up -d'
+                      }
+                  }
               }
           }
-      }
 
 
 
