@@ -81,6 +81,19 @@ pipeline {
           }
       }
 
+       stage('Deploy with Docker Compose') {
+                  steps {
+                      script {
+                          // Remplacer le tag dans le fichier docker-compose avec le tag actuel
+                          sh "sed -i 's/\\${TAG}/${TAG}/g' docker-compose.yml"
+
+                          // Démarrer les services définis dans le fichier docker-compose.yml
+                          sh "docker-compose -f docker-compose.yml up -d"
+                      }
+                  }
+              }
+          }
+
         stage('Mockito Tests') {
             steps {
                 sh 'mvn test'
