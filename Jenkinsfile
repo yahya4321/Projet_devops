@@ -42,25 +42,26 @@ pipeline {
             }
         }
          stage('Docker Build and Push') {
-                    steps {
-                        script {
-                            // Construire l'image Docker en utilisant le fichier Dockerfile
-                            def jarFile = sh(script: "ls target/*.jar | head -n 1", returnStdout: true).trim()
-                            def imageName = "${env.DOCKER_IMAGE_NAME}:${env.APP_VERSION}"
+             steps {
+                 script {
+                     // Construire l'image Docker en utilisant le fichier Dockerfile
+                     def jarFile = sh(script: "ls target/*.jar | head -n 1", returnStdout: true).trim()
+                     def imageName = "${env.DOCKER_IMAGE_NAME}:${env.APP_VERSION}"
 
-                            // Construire l'image Docker
-                            sh "docker build --build-arg JAR_FILE=${jarFile} -t ${imageName} ."
+                     // Construire l'image Docker en passant le fichier JAR en tant qu'argument
+                     sh "docker build --build-arg JAR_FILE=${jarFile} -t ${imageName} ."
 
-                            // Connexion au registre Docker
-                            withCredentials([usernamePassword(credentialsId: "${env.DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                                sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
-                            }
+                     // Connexion au registre Docker
+                     withCredentials([usernamePassword(credentialsId: "${env.DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                         sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
+                     }
 
-                            // Pousser l'image Docker vers le registre
-                            sh "docker push ${imageName}"
-                        }
-                    }
-                }
+                     // Pousser l'image Docker vers le registre
+                     sh "docker push ${imageName}"
+                 }
+             }
+         }
+
          stage('Mockito Tests') {
                     steps {
                         // Exécution des tests unitaires Mockito avec Maven
