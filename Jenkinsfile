@@ -149,7 +149,6 @@ EOF
                     docker stop grafana_container || true
                     docker rm grafana_container || true
 
-                    // Start containers with Docker Compose
                     docker compose -f docker-compose.yml up -d prometheus grafana
                     '''
                 }
