@@ -12,7 +12,7 @@ pipeline {
         CREDENTIALS_ID = 'GitHub_Credentials'
         SONAR_TOKEN = credentials('sonar_token')
         DOCKER_CREDENTIALS_ID = 'Docker_Credentials'
-        DOCKER_IMAGE_NAME = 'projetdevops/alpine'
+        DOCKER_IMAGE_NAME = 'your_dockerhub_username/projetdevops/alpine' // Include Docker Hub username
     }
 
     stages {
@@ -42,7 +42,12 @@ pipeline {
         stage('Verify JAR File') {
             steps {
                 script {
-                    sh 'ls -l target/*.jar || echo "No JAR file found"'
+                    def jarFile = sh(script: 'ls -1 target/*.jar', returnStdout: true).trim()
+                    if (!jarFile) {
+                        error("No JAR file found!")
+                    } else {
+                        echo "JAR file found: ${jarFile}"
+                    }
                 }
             }
         }
@@ -59,7 +64,7 @@ pipeline {
             steps {
                 script {
                     // Log in to Docker Hub
-                    withCredentials([usernamePassword(credentialsId: 'Docker_Credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                         sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
                         // Push the image to the Docker registry
                         sh "docker push ${DOCKER_IMAGE_NAME}:${env.APP_VERSION}"
@@ -68,10 +73,9 @@ pipeline {
             }
         }
 
-
         stage('Mockito Tests') {
             steps {
-                sh 'mvn test '
+                sh 'mvn test'
             }
         }
 
