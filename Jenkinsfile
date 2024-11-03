@@ -80,7 +80,14 @@ pipeline {
               }
           }
       }
-
+    stage('Docker Compose Up') {
+                steps {
+                    script {
+                        sh 'docker-compose down'  // Assurez-vous que les services sont arrêtés d'abord
+                        sh 'docker-compose up -d'  // Lancer les services en arrière-plan
+                    }
+                }
+            }
 
 
 
