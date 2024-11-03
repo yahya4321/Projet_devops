@@ -56,14 +56,15 @@ pipeline {
         }
 
         stage('Deploy to Nexus') {
-                    steps {
-                        script {
-                            withEnv(["PATH+MAVEN=${MAVEN_HOME}/bin"]) {
-                                sh 'mvn deploy -s /usr/share/maven/conf/settings.xml'
-                            }
-                        }
+            steps {
+                script {
+                    withEnv(["PATH+MAVEN=${MAVEN_HOME}/bin"]) {
+                        sh 'mvn deploy -s /var/lib/jenkins/.m2/settings.xml'
                     }
                 }
+            }
+        }
+
 
         stage('Build Docker Image') {
             steps {
