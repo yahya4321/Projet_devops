@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-public class TestMockito {
+ class TestMockito {
 
     @Mock
     private FoyerRepository foyerRepository;
