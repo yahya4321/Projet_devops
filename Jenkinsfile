@@ -30,9 +30,18 @@ pipeline {
                 }
             }
         }
-        stage('Test') {
+        stage('Mockito') {
                     steps {
                         sh 'mvn test'
+                    }
+        }
+        stage('Nexus') {
+                    steps {
+                        script {
+                            withEnv(["PATH+MAVEN=${MAVEN_HOME}/bin"]) {
+                                sh 'mvn deploy -s $HOME/.m2/settings.xml'
+                            }
+                        }
                     }
         }
     }
