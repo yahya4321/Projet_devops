@@ -13,6 +13,9 @@ pipeline {
         SONAR_TOKEN = credentials('sonar_token')
         DOCKER_CREDENTIALS_ID = 'Docker_Credentials'
         DOCKER_IMAGE_NAME = 'firaskdidi/projetdevops'
+         REMOTE_HOST = '192.168.50.4'   // VM IP address
+         REMOTE_USER = 'vagrant'
+         REMOTE_PATH = '/home/vagrant/dockercompose'
     }
 
     stages {
@@ -80,16 +83,31 @@ pipeline {
               }
           }
       }
-    stage('Docker Compose Up') {
+     stage('Setup Remote Directory and Upload Docker Compose') {
                 steps {
                     script {
-                        sh 'docker-compose down'  // Assurez-vous que les services sont arrêtés d'abord
-                        sh 'docker-compose up -d'  // Lancer les services en arrière-plan
+                        sh """
+                        ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} 'mkdir -p ${REMOTE_PATH}'
+                        scp -o StrictHostKeyChecking=no docker-compose.yml ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/docker-compose.yml
+                        """
                     }
                 }
             }
-
-
+         stage('Deploy to VM') {
+                    steps {
+                        script {
+                            // Run Docker Compose on the VM
+                            sh """
+                            ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} << 'EOF'
+                            export APP_VERSION=${env.APP_VERSION}
+                            cd ${REMOTE_PATH}
+                            /usr/bin/docker compose down
+                            APP_VERSION=${env.APP_VERSION} /usr/bin/docker compose up -d
+        EOF
+                            """
+                        }
+                    }
+                }
 
         stage('Mockito Tests') {
             steps {
