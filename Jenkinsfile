@@ -63,7 +63,7 @@ pipeline {
 
                             // Run Prometheus container
                             sh """
-                            docker run -d --name prometheus \
+                            docker run -d --name prometheus-p \
                                 -p 9090:9090 \
                                 -v \$(pwd)/prometheus.yml:/etc/prometheus/prometheus.yml \
                                 prom/prometheus
