@@ -124,43 +124,42 @@ pipeline {
             }
         }
 
-       stage('Deploy to VM') {
-           steps {
-               script {
-                   // Run Docker Compose on the VM to start app and db
-                   sh """
-                   ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} << 'EOF'
-                   export APP_VERSION=${env.APP_VERSION}
-                   cd ${REMOTE_PATH}
-                   docker compose down
-                   docker compose up -d app db
-       EOF
-                   """
-               }
-           }
-       }
+      stage('Deploy to VM') {
+          steps {
+              script {
+                  // Run Docker Compose on the VM to start app and db
+                  sh """
+                  ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} << 'EOF'
+                  export APP_VERSION=${env.APP_VERSION}
+                  cd \$${REMOTE_PATH}
+                  docker compose down
+                  docker compose up -d app db
+      EOF
+                  """
+              }
+          }
+      }
 
-       stage('Deploy Prometheus and Grafana') {
-           steps {
-               script {
-                   sh """
-                   ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} << 'EOF'
-                   cd \${REMOTE_PATH}
+      stage('Deploy Prometheus and Grafana') {
+          steps {
+              script {
+                  sh """
+                  ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} << 'EOF'
+                  cd \$${REMOTE_PATH}
 
-                   # Check if Prometheus and Grafana containers are running
-                   if [ ! "$(docker ps -q -f name=prometheus_container)" ]; then
-                     docker start prometheus_container || docker compose up -d prometheus
-                   fi
+                  # Check if Prometheus and Grafana containers are running
+                  if [ ! "\$(docker ps -q -f name=prometheus_container)" ]; then
+                      docker start prometheus_container || docker compose up -d prometheus
+                  fi
 
-                   if [ ! "$(docker ps -q -f name=grafana_container)" ]; then
-                     docker start grafana_container || docker compose up -d grafana
-                   fi
-       EOF
-                   """
-               }
-           }
-       }
-
+                  if [ ! "\$(docker ps -q -f name=grafana_container)" ]; then
+                      docker start grafana_container || docker compose up -d grafana
+                  fi
+      EOF
+                  """
+              }
+          }
+      }
 
 
     }
