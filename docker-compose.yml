@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    image: "adamnajar98/app.jar:${APP_VERSION}"  # Use dynamic version tag
+    image: "adamnajar98/app.jar"  # Use dynamic version tag
     container_name: app_container
     ports:
       - "8089:8089"
@@ -13,7 +13,7 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     depends_on:
       - db
-      - prometheus
+
 
   db:
     image: mysql:8.0
