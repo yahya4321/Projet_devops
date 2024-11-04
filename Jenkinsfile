@@ -88,7 +88,13 @@ pipeline {
                    }
                }
 
+        stage('Docker compose ') {
+                                 steps {
+                                     sh "docker compose up -d docker-compose.yml"
+                                 }
+                             }
 
+         }
 
         stage('Deploy to Nexus') {
             steps {
@@ -129,31 +135,7 @@ pipeline {
               }
           }
       }
-     stage('Setup Remote Directory and Upload Docker Compose') {
-                steps {
-                    script {
-                        sh """
-                        ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} 'mkdir -p ${REMOTE_PATH}'
-                        scp -o StrictHostKeyChecking=no docker-compose.yml ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/docker-compose.yml
-                        """
-                    }
-                }
-            }
-         stage('Deploy to VM') {
-                    steps {
-                        script {
-                            // Run Docker Compose on the VM
-                            sh """
-                            ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} << 'EOF'
-                            export APP_VERSION=${env.APP_VERSION}
-                            cd ${REMOTE_PATH}
-                            /usr/bin/docker compose down
-                            APP_VERSION=${env.APP_VERSION} /usr/bin/docker compose up -d
-        EOF
-                            """
-                        }
-                    }
-                }
+
 
         stage('Mockito Tests') {
             steps {
