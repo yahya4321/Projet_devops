@@ -1,8 +1,8 @@
-version: '3.8'
 
 services:
   app:
-    image: "firaskdidi/projetdevops:${APP_VERSION}"  # Use dynamic version tag
+    image: firaskdidi/projetdevops  # Use dynamic version tag
+    build: ./
     container_name: app_container
     ports:
       - "8089:8089"
