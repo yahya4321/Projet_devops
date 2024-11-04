@@ -145,35 +145,14 @@ pipeline {
             }
         }
 
-        stage('Setup Remote Directory and Upload Docker Compose') {
-            steps {
-                script {
-                    sshagent(['jenkins-ssh-credentials-id']) {
-                        sh """
-                        ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} 'mkdir -p ${REMOTE_PATH}'
-                        scp -o StrictHostKeyChecking=no docker-compose.yml ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/docker-compose.yml
-                        """
-                    }
-                }
-            }
-        }
+       stage('Docker compose ( BackEnd MySql)') {
+                   steps {
+                       script {
 
-        stage('Deploy Docker Compose') {
-            steps {
-                script {
-                    sshagent(['jenkins-ssh-credentials-id']) {
-                        sh """
-                        ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} << EOF
-                        cd ${REMOTE_PATH}
-                        docker-compose down
-                        docker-compose up -d
-                        EOF
-                        """
-                    }
-                }
-            }
-        }
-    }
+                           sh 'docker compose up -d'
+                       }
+                   }
+               }
 
     post {
         always {
