@@ -13,9 +13,9 @@ pipeline {
         SONAR_TOKEN = credentials('sonar_token')
         DOCKER_CREDENTIALS_ID = 'Docker_Credentials'
         DOCKER_IMAGE_NAME = 'firaskdidi/projetdevops'
-         REMOTE_HOST = '192.168.50.4'   // VM IP address
-         REMOTE_USER = 'vagrant'
-         REMOTE_PATH = '/home/vagrant/dockercompose'
+        REMOTE_HOST = '192.168.50.4'   // VM IP address
+        REMOTE_USER = 'vagrant'
+        REMOTE_PATH = '/home/vagrant/dockercompose'
     }
 
     stages {
@@ -42,73 +42,69 @@ pipeline {
             }
         }
 
-                stage('Verify JAR File') {
-                    steps {
-                        script {
-                            def jarFile = sh(script: 'ls -1 target/*.jar', returnStdout: true).trim()
-                            if (!jarFile) {
-                                error("No JAR file found!")
-                            } else {
-                                echo "JAR file found: ${jarFile}"
-                            }
-                        }
+        stage('Verify JAR File') {
+            steps {
+                script {
+                    def jarFile = sh(script: 'ls -1 target/*.jar', returnStdout: true).trim()
+                    if (!jarFile) {
+                        error("No JAR file found!")
+                    } else {
+                        echo "JAR file found: ${jarFile}"
                     }
                 }
+            }
+        }
 
-                 stage('Mockito Tests') {
-                            steps {
-                                sh 'mvn test'
-                            }
-                        }
+        stage('Mockito Tests') {
+            steps {
+                sh 'mvn test'
+            }
+        }
 
-                        stage('SonarQube Analysis') {
-                            steps {
-                                sh 'mvn sonar:sonar'
-                            }
-                        }
+        stage('SonarQube Analysis') {
+            steps {
+                sh 'mvn sonar:sonar'
+            }
+        }
 
-                        stage('Clean') {
-                            steps {
-                                sh 'mvn clean'
-                            }
-                        }
-                    }
-                                stage('Build and Run Grafana') {
-                                    steps {
-                                        script {
-                                            // Stop and remove the existing Grafana container if it exists
-                                            sh 'docker rm -f grafana || true'
+        stage('Clean') {
+            steps {
+                sh 'mvn clean'
+            }
+        }
 
-                                            // Run Grafana container
-                                            sh """
-                                            docker run -d --name grafana \
-                                                -p 3000:3000 \
-                                                grafana/grafana
-                                            """
-                                        }
-                                    }
-                                }
+        stage('Build and Run Grafana') {
+            steps {
+                script {
+                    // Stop and remove the existing Grafana container if it exists
+                    sh 'docker rm -f grafana || true'
 
+                    // Run Grafana container
+                    sh """
+                    docker run -d --name grafana \
+                        -p 3000:3000 \
+                        grafana/grafana
+                    """
+                }
+            }
+        }
 
-               stage('Build and Run Prometheus') {
-                   steps {
-                       script {
-                           // Stop and remove the existing Prometheus container if it exists
-                           sh 'docker rm -f prometheus-p || true'
+        stage('Build and Run Prometheus') {
+            steps {
+                script {
+                    // Stop and remove the existing Prometheus container if it exists
+                    sh 'docker rm -f prometheus-p || true'
 
-                           // Run Prometheus container
-                           sh """
-                           docker run -d --name prometheus-p \
-                               -p 9090:9090 \
-                               -v \$(pwd)/prometheus.yml:/etc/prometheus/prometheus.yml \
-                               prom/prometheus
-                           """
-                       }
-                   }
-               }
-
-
-
+                    // Run Prometheus container
+                    sh """
+                    docker run -d --name prometheus-p \
+                        -p 9090:9090 \
+                        -v \$(pwd)/prometheus.yml:/etc/prometheus/prometheus.yml \
+                        prom/prometheus
+                    """
+                }
+            }
+        }
 
         stage('Deploy to Nexus') {
             steps {
@@ -120,7 +116,6 @@ pipeline {
             }
         }
 
-
         stage('Build Docker Image') {
             steps {
                 script {
@@ -129,55 +124,51 @@ pipeline {
             }
         }
 
-      stage('Push Docker Image to Docker Hub') {
-          steps {
-              script {
-                  withCredentials([usernamePassword(credentialsId: 'Docker_Credentials',
-                                                   usernameVariable: 'DOCKERHUB_USERNAME',
-                                                   passwordVariable: 'DOCKERHUB_PASSWORD')]) {
-                      // Log in to Docker Hub sans utiliser d'interpolation de chaînes
-                      sh '''
-                          echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-                      '''
+        stage('Push Docker Image to Docker Hub') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'Docker_Credentials',
+                                                     usernameVariable: 'DOCKERHUB_USERNAME',
+                                                     passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                        // Log in to Docker Hub without using string interpolation
+                        sh '''
+                            echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+                        '''
 
-                      // Poussez l'image dans Docker Hub
-                      sh "docker push ${DOCKER_IMAGE_NAME}:${env.APP_VERSION}"
+                        // Push the image to Docker Hub
+                        sh "docker push ${DOCKER_IMAGE_NAME}:${env.APP_VERSION}"
 
-                      // Déconnexion de Docker Hub
-                      sh "docker logout"
-                  }
-              }
-          }
-      }
+                        // Logout from Docker Hub
+                        sh "docker logout"
+                    }
+                }
+            }
+        }
 
+        stage('Docker Compose') {
+            steps {
+                sh "docker compose up -d docker-compose.yml"
+            }
+        }
+    }
 
-      stage('Docker compose ') {
-                       steps {
-                            sh "docker compose up -d docker-compose.yml"
-                            }
-              }
-
-
-
-
-
-   post {
-           always {
-               archiveArtifacts artifacts: 'target/*.jar', allowEmptyArchive: true
-           }
-           success {
-               echo 'Pipeline executed successfully!'
-               // Send success email
-               mail to: 'kdidifiras30@gmail.com',
-                    subject: "Jenkins Pipeline Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                    body: "Good news! The pipeline ${env.JOB_NAME} has completed successfully. Check the details here: ${env.BUILD_URL}"
-           }
-           failure {
-               echo 'Pipeline failed.'
-               // Send failure email
-               mail to: 'kdidifiras30@gmail.com',
-                    subject: "Jenkins Pipeline Failure: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                    body: "Unfortunately, the pipeline ${env.JOB_NAME} has failed. Please check the details here: ${env.BUILD_URL}"
-           }
-       }
+    post {
+        always {
+            archiveArtifacts artifacts: 'target/*.jar', allowEmptyArchive: true
+        }
+        success {
+            echo 'Pipeline executed successfully!'
+            // Send success email
+            mail to: 'kdidifiras30@gmail.com',
+                subject: "Jenkins Pipeline Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: "Good news! The pipeline ${env.JOB_NAME} has completed successfully. Check the details here: ${env.BUILD_URL}"
+        }
+        failure {
+            echo 'Pipeline failed.'
+            // Send failure email
+            mail to: 'kdidifiras30@gmail.com',
+                subject: "Jenkins Pipeline Failure: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: "Unfortunately, the pipeline ${env.JOB_NAME} has failed. Please check the details here: ${env.BUILD_URL}"
+        }
+    }
 }
