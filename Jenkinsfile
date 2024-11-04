@@ -1,5 +1,9 @@
 pipeline {
     agent any
+      environment {
+
+            DOCKER_CREDENTIALS_ID = '3e79e975-e998-4c86-8b83-48a49a44ea77'
+                   }
     stages {
         stage('Git') {
             steps {
@@ -63,7 +67,19 @@ pipeline {
                         sh "docker build -t adamnajar98/app.jar ."
                     }
                 }
-
+         stage('Push Docker Image to Docker Hub') {
+                    steps {
+                        script {
+                            withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID,
+                                                             usernameVariable: 'DOCKERHUB_USERNAME',
+                                                             passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                                sh "echo ${DOCKERHUB_PASSWORD} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin"
+                                sh "docker push ${DOCKER_IMAGE}:${env.APP_VERSION}"
+                                sh "docker logout"
+                            }
+                        }
+                    }
+                }
 
     }
 }
