@@ -132,8 +132,12 @@ pipeline {
                   export APP_VERSION=${env.APP_VERSION}
                   cd ${REMOTE_PATH}
 
-                  # Stop and remove existing containers to avoid conflicts
+                  # Ensure all services are stopped and removed to avoid conflicts
                   docker compose down || true
+
+                  # Manually stop and remove specific containers if they still exist
+                  docker stop prometheus_container grafana_container app_container mysql_container || true
+                  docker rm prometheus_container grafana_container app_container mysql_container || true
 
                   # Start all services defined in docker-compose.yml
                   docker compose up -d
@@ -141,6 +145,8 @@ pipeline {
                   """
               }
           }
+      }
+
       }
 
 
