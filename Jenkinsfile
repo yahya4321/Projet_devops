@@ -128,7 +128,7 @@ pipeline {
           steps {
               script {
                   sh """
-                  ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} << 'EOF'
+                  ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} <<EOF
                   export APP_VERSION=${env.APP_VERSION}
                   cd ${REMOTE_PATH}
 
@@ -146,6 +146,7 @@ pipeline {
               }
           }
       }
+
 
     }
 
