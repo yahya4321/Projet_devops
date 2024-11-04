@@ -63,10 +63,11 @@ pipeline {
         stage('Docker compose (BackEnd MySql)') {
             steps {
                 script {
-                    sh 'docker compose -f /var/lib/jenkins/workspace/piplinedevops/docker-compose.yml up -d'
+                    sh 'docker-compose -f ${WORKSPACE}/Docker-compose.yml up -d'
                 }
             }
         }
+
 
         stage('Mockito Tests') {
             steps {
