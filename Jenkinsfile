@@ -55,6 +55,17 @@ pipeline {
             }
         }
 
+        stage('Docker compose (BackEnd MySql)') {
+                   steps {
+                       script {
+                           sh '''
+                               cd ${WORKSPACE}
+                               docker compose up -d
+                           '''
+                       }
+                   }
+               }
+
         stage('Mockito Tests') {
             steps {
                 sh 'mvn test'
@@ -123,14 +134,8 @@ pipeline {
                         }
                     }
                 }
-        stage('Docker compose ( BackEnd MySql)') {
-                           steps {
-                               script {
 
-                                   sh 'docker compose up -d'
-                               }
-                           }
-                       }
+
 
 
         stage('Push Docker Image to Docker Hub') {
