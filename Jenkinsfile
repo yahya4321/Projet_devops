@@ -72,7 +72,7 @@ pipeline {
                         withCredentials([usernamePassword(credentialsId: '3e79e975-e998-4c86-8b83-48a49a44ea77', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                             sh '''
                             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-                            docker push ${DOCKER_IMAGE}
+                            docker push adamnajar98/app.jar
                             '''
                         }
                     }
