@@ -53,6 +53,8 @@ pipeline {
                         -Dfile=target/${artifactId}-${version}.jar \
                         -DrepositoryId=nexus-repo \
                         -Durl=${nexusUrl}/repository/maven-releases/
+                        -Dusername=admin
+                        -Dpassword=Adam1234
                     """
                 }
             }
