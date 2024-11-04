@@ -131,7 +131,7 @@ pipeline {
                   sh """
                   ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} << 'EOF'
                   export APP_VERSION=${env.APP_VERSION}
-                  cd \$${REMOTE_PATH}
+                  cd ${REMOTE_PATH}
                   docker compose down
                   docker compose up -d app db
       EOF
@@ -145,7 +145,7 @@ pipeline {
               script {
                   sh """
                   ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} << 'EOF'
-                  cd \$${REMOTE_PATH}
+                  cd ${REMOTE_PATH}
 
                   # Check if Prometheus and Grafana containers are running
                   if [ ! "\$(docker ps -q -f name=prometheus_container)" ]; then
@@ -160,6 +160,7 @@ pipeline {
               }
           }
       }
+
 
 
     }
