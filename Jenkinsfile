@@ -36,13 +36,26 @@ pipeline {
                     }
         }
         stage('Nexus') {
-                    steps {
-                        script {
-                            withEnv(["PATH+MAVEN=${MAVEN_HOME}/bin"]) {
-                                sh 'mvn deploy -s $HOME/.m2/settings.xml'
-                            }
-                        }
-                    }
+            steps {
+                script {
+                    // Remplacez les valeurs par vos configurations spécifiques
+                    def nexusUrl = "http://192.168.50.4:8081"
+                    def artifactId = "tp-foyer"
+                    def version = "5.0.0"
+                    def groupId = "tn.esprit"
+
+                    // Déployer l'artifact dans Nexus
+                    sh """
+                        mvn deploy:deploy-file -DgroupId=${groupId} \
+                        -DartifactId=${artifactId} \
+                        -Dversion=${version} \
+                        -Dpackaging=jar \
+                        -Dfile=target/${artifactId}-${version}.jar \
+                        -DrepositoryId=nexus-repo \
+                        -Durl=${nexusUrl}/repository/maven-releases/
+                    """
+                }
+            }
         }
     }
 }
