@@ -15,7 +15,7 @@ pipeline {
         DOCKER_IMAGE_NAME = 'firaskdidi/projetdevops'
         REMOTE_HOST = '192.168.50.4'   // VM IP address
         REMOTE_USER = 'vagrant'
-        REMOTE_PATH = '/home/vagrant/dockercompose'
+        REMOTE_PATH = '/home/vagrant/your-app-directory'
     }
 
     stages {
@@ -145,12 +145,35 @@ pipeline {
             }
         }
 
-        stage('Docker Compose') {
+        stage('Setup Remote Directory and Upload Docker Compose') {
             steps {
-                sh "docker compose up -d docker-compose.yml"
+                script {
+                    sshagent(['jenkins-ssh-credentials-id']) {
+                        sh """
+                        ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} 'mkdir -p ${REMOTE_PATH}'
+                        scp -o StrictHostKeyChecking=no docker-compose.yml ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/docker-compose.yml
+                        """
+                    }
+                }
             }
         }
-    }
+
+        stage('Deploy Docker Compose') {
+            steps {
+                script {
+                    sshagent(['jenkins-ssh-credentials-id']) {
+                        sh """
+                        ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} << EOF
+                        cd ${REMOTE_PATH}
+                        docker-compose down
+                        docker-compose up -d
+                        EOF
+                        """
+                    }
+                }
+            }
+        }
+
 
     post {
         always {
