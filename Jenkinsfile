@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     tools {
-        maven 'M2_HOME'       // Assurez-vous que "M2_HOME" est le nom configuré pour Maven dans Jenkins
-        jdk 'JAVA_HOME'       // Assurez-vous que "JAVA_HOME" est le nom configuré pour JDK dans Jenkins
+        maven 'M2_HOME'       // Ensure "M2_HOME" is the name configured for Maven in Jenkins
+        jdk 'JAVA_HOME'       // Ensure "JAVA_HOME" is the name configured for JDK in Jenkins
     }
 
     environment {
@@ -19,10 +19,11 @@ pipeline {
     stages {
 
         stage('Clean Workspace') {
-                           steps {
-                               cleanWs() // Jenkins built-in function to clean workspace
-                           }
+            steps {
+                cleanWs() // Jenkins built-in function to clean workspace
+            }
         }
+
         stage('Checkout Code') {
             steps {
                 git branch: 'Yahya_Branch_Bloc',
@@ -124,36 +125,29 @@ pipeline {
             }
         }
 
-      stage('Deploy All Services') {
-          steps {
-              script {
-                  sh """
-                  ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} <<EOF
-                  export APP_VERSION=${env.APP_VERSION}
-                  cd ${REMOTE_PATH}
+        stage('Deploy All Services') {
+            steps {
+                script {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} <<EOF
+export APP_VERSION=${env.APP_VERSION}
+cd ${REMOTE_PATH}
 
-                  # Ensure all services are stopped and removed to avoid conflicts
-                  docker compose down || true
+# Ensure all services are stopped and removed to avoid conflicts
+docker compose down || true
 
-                  # Manually stop and remove specific containers if they still exist
-                  docker stop prometheus_container grafana_container app_container mysql_container || true
-                  docker rm prometheus_container grafana_container app_container mysql_container || true
+# Manually stop and remove specific containers if they still exist
+docker stop prometheus_container grafana_container app_container mysql_container || true
+docker rm prometheus_container grafana_container app_container mysql_container || true
 
-                  # Start all services defined in docker-compose.yml
-                  docker compose up -d
-      EOF
-                  """
-              }
-          }
-      }
-
-
+# Start all services defined in docker-compose.yml
+docker compose up -d
+EOF
+                    """
+                }
+            }
+        }
     }
-
-
-
-
-
 
     post {
         always {
