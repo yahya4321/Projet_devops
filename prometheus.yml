@@ -6,7 +6,7 @@ scrape_configs:
   - job_name: 'app'
     metrics_path: '/tpfoyer/actuator/prometheus'
     static_configs:
-      - targets: ['app_container:8089']
+      - targets: ['app:8089']
   - job_name: 'prometheus'
     static_configs:
       - targets: ['prometheus_container:9090']
