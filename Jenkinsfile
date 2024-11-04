@@ -89,12 +89,12 @@ pipeline {
                }
 
         stage('Docker compose ') {
-                                 steps {
-                                     sh "docker compose up -d docker-compose.yml"
-                                 }
-                             }
+                 steps {
+                      sh "docker compose up -d docker-compose.yml"
+                      }
+        }
 
-         }
+
 
         stage('Deploy to Nexus') {
             steps {
