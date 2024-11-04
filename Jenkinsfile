@@ -116,13 +116,13 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    sh "docker build -t ${DOCKER_IMAGE_NAME}:${env.APP_VERSION} --build-arg JAR_FILE=tp-foyer-${env.APP_VERSION}.jar ."
+        stage('Build Docker Image (Spring Part)') {
+                    steps {
+                        script {
+                            def dockerImage=docker.build("firaskdidi/projetdevops")
+                        }
+                    }
                 }
-            }
-        }
         stage('Docker compose ( BackEnd MySql)') {
                            steps {
                                script {
