@@ -124,47 +124,25 @@ pipeline {
             }
         }
 
-      stage('Deploy to VM') {
+      stage('Deploy All Services') {
           steps {
               script {
-                  // Run Docker Compose on the VM to start app and db
                   sh """
                   ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} << 'EOF'
                   export APP_VERSION=${env.APP_VERSION}
                   cd ${REMOTE_PATH}
-                  docker compose down
-                  docker compose up -d app db
+
+                  # Stop and remove existing containers to avoid conflicts
+                  docker compose down || true
+
+                  # Start all services defined in docker-compose.yml
+                  docker compose up -d
       EOF
                   """
               }
           }
       }
 
-      stage('Deploy Prometheus and Grafana') {
-          steps {
-              script {
-                  sh """
-                  ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} << 'EOF'
-                  cd ${REMOTE_PATH}
-
-                  # Stop and remove existing Prometheus and Grafana containers if they exist
-                  if [ \$(docker ps -aq -f name=prometheus_container) ]; then
-                      docker stop prometheus_container || true
-                      docker rm prometheus_container || true
-                  fi
-
-                  if [ \$(docker ps -aq -f name=grafana_container) ]; then
-                      docker stop grafana_container || true
-                      docker rm grafana_container || true
-                  fi
-
-                  # Start Prometheus and Grafana containers
-                  docker compose -f docker-compose.yml up -d prometheus grafana
-      EOF
-                  """
-              }
-          }
-      }
 
 
 
