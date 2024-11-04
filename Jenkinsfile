@@ -54,6 +54,22 @@ pipeline {
                         }
                     }
                 }
+                                stage('Build and Run Grafana') {
+                                    steps {
+                                        script {
+                                            // Stop and remove the existing Grafana container if it exists
+                                            sh 'docker rm -f grafana || true'
+
+                                            // Run Grafana container
+                                            sh """
+                                            docker run -d --name grafana \
+                                                -p 3000:3000 \
+                                                grafana/grafana
+                                            """
+                                        }
+                                    }
+                                }
+
 
                stage('Build and Run Prometheus') {
                    steps {
@@ -73,21 +89,6 @@ pipeline {
                }
 
 
-                stage('Build and Run Grafana') {
-                    steps {
-                        script {
-                            // Stop and remove the existing Grafana container if it exists
-                            sh 'docker rm -f grafana || true'
-
-                            // Run Grafana container
-                            sh """
-                            docker run -d --name grafana \
-                                -p 3000:3000 \
-                                grafana/grafana
-                            """
-                        }
-                    }
-                }
 
         stage('Deploy to Nexus') {
             steps {
