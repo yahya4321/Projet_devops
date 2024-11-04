@@ -42,19 +42,19 @@ pipeline {
             }
         }
 
-        stage('Verify JAR File') {
-            steps {
-                script {
-                    def jarFile = sh(script: 'ls -1 target/*.jar', returnStdout: true).trim()
-                    if (!jarFile) {
-                        error("No JAR file found!")
-                    } else {
-                        echo "JAR file found: ${jarFile}"
+                stage('Verify JAR File') {
+                    steps {
+                        script {
+                            def jarFile = sh(script: 'ls -1 target/*.jar', returnStdout: true).trim()
+                            if (!jarFile) {
+                                error("No JAR file found!")
+                            } else {
+                                echo "JAR file found: ${jarFile}"
+                            }
+                        }
                     }
                 }
-            }
-        }
-         stages {
+
                 stage('Build and Run Prometheus') {
                     steps {
                         script {
@@ -87,6 +87,7 @@ pipeline {
                         }
                     }
                 }
+
         stage('Deploy to Nexus') {
             steps {
                 script {
