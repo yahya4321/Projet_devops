@@ -147,14 +147,19 @@ pipeline {
                   ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} << 'EOF'
                   cd ${REMOTE_PATH}
 
-                  # Check if Prometheus and Grafana containers are running
-                  if [ ! "\$(docker ps -q -f name=prometheus_container)" ]; then
-                      docker start prometheus_container || docker compose up -d prometheus
+                  # Stop and remove existing Prometheus and Grafana containers if they exist
+                  if [ \$(docker ps -aq -f name=prometheus_container) ]; then
+                      docker stop prometheus_container || true
+                      docker rm prometheus_container || true
                   fi
 
-                  if [ ! "\$(docker ps -q -f name=grafana_container)" ]; then
-                      docker start grafana_container || docker compose up -d grafana
+                  if [ \$(docker ps -aq -f name=grafana_container) ]; then
+                      docker stop grafana_container || true
+                      docker rm grafana_container || true
                   fi
+
+                  # Start Prometheus and Grafana containers
+                  docker compose -f docker-compose.yml up -d prometheus grafana
       EOF
                   """
               }
