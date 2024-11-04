@@ -139,21 +139,23 @@ EOF
                 }
             }
         }
-        stage('Deploy Prometheus and Grafana') {
-            steps {
-                script {
-                    // Stop and remove existing containers
-                    sh '''
-                    docker stop prometheus_container || true
-                    docker rm prometheus_container || true
-                    docker stop grafana_container || true
-                    docker rm grafana_container || true
+     stage('Deploy Prometheus and Grafana') {
+         steps {
+             script {
+                 sh """
+                 ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} << 'EOF'
+                 cd ${REMOTE_PATH}
+                 docker stop prometheus_container || true
+                 docker rm prometheus_container || true
+                 docker stop grafana_container || true
+                 docker rm grafana_container || true
+                 docker compose -f docker-compose.yml up -d prometheus grafana
+     EOF
+                 """
+             }
+         }
+     }
 
-                    docker compose -f docker-compose.yml up -d prometheus grafana
-                    '''
-                }
-            }
-        }
 
 
     }
