@@ -123,6 +123,15 @@ pipeline {
                 }
             }
         }
+        stage('Docker compose ( BackEnd MySql)') {
+                           steps {
+                               script {
+
+                                   sh 'docker compose up -d'
+                               }
+                           }
+                       }
+
 
         stage('Push Docker Image to Docker Hub') {
             steps {
@@ -145,14 +154,6 @@ pipeline {
             }
         }
 
-       stage('Docker compose ( BackEnd MySql)') {
-                   steps {
-                       script {
-
-                           sh 'docker compose up -d'
-                       }
-                   }
-               }
 
     post {
         always {
