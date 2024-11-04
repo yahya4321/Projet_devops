@@ -58,5 +58,13 @@ pipeline {
                 }
             }
         }
+        stage('Docker Image') {
+            steps {
+                script {
+                    sh "docker build -t ${DOCKER_IMAGE}:${env.APP_VERSION} --build-arg JAR_FILE=tp-foyer-${env.APP_VERSION}.jar ."
+                }
+            }
+        }
+
     }
 }
