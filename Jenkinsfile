@@ -54,6 +54,25 @@ pipeline {
                         }
                     }
                 }
+
+                 stage('Mockito Tests') {
+                            steps {
+                                sh 'mvn test'
+                            }
+                        }
+
+                        stage('SonarQube Analysis') {
+                            steps {
+                                sh 'mvn sonar:sonar'
+                            }
+                        }
+
+                        stage('Clean') {
+                            steps {
+                                sh 'mvn clean'
+                            }
+                        }
+                    }
                                 stage('Build and Run Grafana') {
                                     steps {
                                         script {
@@ -88,11 +107,6 @@ pipeline {
                    }
                }
 
-        stage('Docker compose ') {
-                 steps {
-                      sh "docker compose up -d docker-compose.yml"
-                      }
-        }
 
 
 
@@ -136,25 +150,15 @@ pipeline {
           }
       }
 
+      stage('Docker compose ') {
+                       steps {
+                            sh "docker compose up -d docker-compose.yml"
+                            }
+              }
 
-        stage('Mockito Tests') {
-            steps {
-                sh 'mvn test'
-            }
-        }
 
-        stage('SonarQube Analysis') {
-            steps {
-                sh 'mvn sonar:sonar'
-            }
-        }
 
-        stage('Clean') {
-            steps {
-                sh 'mvn clean'
-            }
-        }
-    }
+
 
    post {
            always {
