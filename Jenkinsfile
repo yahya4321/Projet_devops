@@ -54,17 +54,20 @@ pipeline {
                 }
             }
         }
+        stage('Debug Workspace') {
+            steps {
+                sh 'ls -l ${WORKSPACE}'
+            }
+        }
 
         stage('Docker compose (BackEnd MySql)') {
-                   steps {
-                       script {
-                           sh '''
-                               cd ${WORKSPACE}
-                               docker compose up -d
-                           '''
-                       }
-                   }
-               }
+            steps {
+                script {
+                    sh 'docker-compose -f ${WORKSPACE}/docker-compose.yml up -d'
+                }
+            }
+        }
+
 
         stage('Mockito Tests') {
             steps {
