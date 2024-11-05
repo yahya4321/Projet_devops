@@ -65,6 +65,15 @@ pipeline {
                         sh 'mvn sonar:sonar'
                     }
                 }
+        stage('Deploy to Nexus') {
+                            steps {
+                                script {
+                                    withEnv(["PATH+MAVEN=${MAVEN_HOME}/bin"]) {
+                                        sh 'mvn deploy -s /var/lib/jenkins/.m2/settings.xml'
+                                    }
+                                }
+                            }
+                        }
 
         stage('Build Docker Image (Spring Part)') {
             steps {
