@@ -81,15 +81,11 @@ pipeline {
                             steps {
                                 sh "docker-compose up -d"
                             }
-                        }
+        }
 
     }
     post {
-            always {
-                // Génère un rapport JUnit et collecte les données de couverture de code avec JaCoCo
-                junit '**/target/surefire-reports/*.xml'
-                jacoco()
-            }
+
 
             success {
                 echo 'Build, Test, and SonarQube Analysis completed successfully!'
