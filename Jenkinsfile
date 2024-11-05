@@ -103,7 +103,7 @@ pipeline {
                     subject: "Jenkins Pipeline Failure: ${currentBuild.fullDisplayName}",
                     body: """<p>The Jenkins pipeline for <b>${env.JOB_NAME}</b> failed.</p>
                              <p>Check the logs for more details: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>""",
-                    to: 'yahyaaahamdi8756@gmail.com'
+                    to: 'najjaradam668@gmail.com'
                 )
             }
         }
