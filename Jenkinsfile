@@ -42,6 +42,54 @@ pipeline {
             }
         }
 
+        stage('Verify JAR File') {
+                    steps {
+                        script {
+                            def jarFile = sh(script: 'ls -1 target/*.jar', returnStdout: true).trim()
+                            if (!jarFile) {
+                                error("No JAR file found!")
+                            } else {
+                                echo "JAR file found: ${jarFile}"
+                            }
+                        }
+                    }
+                }
+
+
+
+                stage('Mockito Tests') {
+                    steps {
+                        sh 'mvn test'
+                    }
+                }
+                 stage('Build Docker Image (Spring Part)') {
+                                            steps {
+                                                script {
+                                                    def dockerImage=docker.build("firaskdidi/projetdevops")
+                                                }
+                                            }
+                                        }
+                                        stage('Push Docker Image to Docker Hub') {
+                                                    steps {
+                                                        script {
+                                                            withCredentials([usernamePassword(credentialsId: 'Docker_Credentials',
+                                                                                             usernameVariable: 'DOCKERHUB_USERNAME',
+                                                                                             passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                                                                // Log in to Docker Hub without using string interpolation
+                                                                sh '''
+                                                                    echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+                                                                '''
+
+                                                                // Push the image to Docker Hub
+                                                                sh "docker push ${DOCKER_IMAGE_NAME}:${env.APP_VERSION}"
+
+                                                                // Logout from Docker Hub
+                                                                sh "docker logout"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
 
     }
     post {
