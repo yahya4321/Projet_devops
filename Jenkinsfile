@@ -69,7 +69,7 @@ pipeline {
                             steps {
                                 script {
                                     withEnv(["PATH+MAVEN=${MAVEN_HOME}/bin"]) {
-                                        sh 'mvn deploy -s /var/lib/jenkins/.m2/settings.xml'
+                                        sh 'mvn deploy -s /usr/share/maven/conf/settings.xml'
                                     }
                                 }
                             }
