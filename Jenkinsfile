@@ -54,19 +54,7 @@ pipeline {
                 }
             }
         }
-        stage('Debug Workspace') {
-            steps {
-                sh 'ls -l ${WORKSPACE}'
-            }
-        }
 
-        stage('Docker compose (BackEnd MySql)') {
-            steps {
-                script {
-                    sh 'docker compose -f ${WORKSPACE}/Docker-compose.yml up -d'
-                }
-            }
-        }
 
 
         stage('Mockito Tests') {
@@ -80,13 +68,61 @@ pipeline {
                 sh 'mvn sonar:sonar'
             }
         }
+        stage('Deploy to Nexus') {
+                    steps {
+                        script {
+                            withEnv(["PATH+MAVEN=${MAVEN_HOME}/bin"]) {
+                                sh 'mvn deploy -s /var/lib/jenkins/.m2/settings.xml'
+                            }
+                        }
+                    }
+                }
+        stage('Build Docker Image (Spring Part)') {
+                            steps {
+                                script {
+                                    def dockerImage=docker.build("firaskdidi/projetdevops")
+                                }
+                            }
+                        }
+                        stage('Push Docker Image to Docker Hub') {
+                                    steps {
+                                        script {
+                                            withCredentials([usernamePassword(credentialsId: 'Docker_Credentials',
+                                                                             usernameVariable: 'DOCKERHUB_USERNAME',
+                                                                             passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                                                // Log in to Docker Hub without using string interpolation
+                                                sh '''
+                                                    echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+                                                '''
+
+                                                // Push the image to Docker Hub
+                                                sh "docker push ${DOCKER_IMAGE_NAME}:${env.APP_VERSION}"
+
+                                                // Logout from Docker Hub
+                                                sh "docker logout"
+                                            }
+                                        }
+                                    }
+                                }
 
         stage('Clean') {
             steps {
                 sh 'mvn clean'
             }
         }
+        stage('Debug Workspace') {
+            steps {
+                sh 'ls -l ${WORKSPACE}'
+            }
+        }
 
+        stage('Docker compose (BackEnd MySql)') {
+            steps {
+                script {
+                    sh 'docker compose -f ${WORKSPACE}/Docker-compose.yml up -d'
+                }
+            }
+        }
         stage('Build and Run Grafana') {
             steps {
                 script {
@@ -120,47 +156,14 @@ pipeline {
             }
         }
 
-        stage('Deploy to Nexus') {
-            steps {
-                script {
-                    withEnv(["PATH+MAVEN=${MAVEN_HOME}/bin"]) {
-                        sh 'mvn deploy -s /var/lib/jenkins/.m2/settings.xml'
-                    }
-                }
-            }
-        }
-
-        stage('Build Docker Image (Spring Part)') {
-                    steps {
-                        script {
-                            def dockerImage=docker.build("firaskdidi/projetdevops")
-                        }
-                    }
-                }
 
 
 
 
-        stage('Push Docker Image to Docker Hub') {
-            steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'Docker_Credentials',
-                                                     usernameVariable: 'DOCKERHUB_USERNAME',
-                                                     passwordVariable: 'DOCKERHUB_PASSWORD')]) {
-                        // Log in to Docker Hub without using string interpolation
-                        sh '''
-                            echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-                        '''
 
-                        // Push the image to Docker Hub
-                        sh "docker push ${DOCKER_IMAGE_NAME}:${env.APP_VERSION}"
 
-                        // Logout from Docker Hub
-                        sh "docker logout"
-                    }
-                }
-            }
-        }
+
+
 
     }
     post {
