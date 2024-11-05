@@ -97,7 +97,7 @@ pipeline {
                     subject: "Jenkins Pipeline Success: ${currentBuild.fullDisplayName}",
                     body: """<p>The Jenkins pipeline for <b>${env.JOB_NAME}</b> completed successfully.</p>
                              <p>Build URL: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>""",
-                    to: 'yahyaaahamdi8756@gmail.com'
+                    to: 'najjaradam668@gmail.com'
                 )
             }
 
