@@ -90,6 +90,20 @@ pipeline {
         }
     }
 
+    stage('Debug Workspace') {
+                steps {
+                    sh 'ls -l ${WORKSPACE}'
+                }
+            }
+
+            stage('Docker compose (BackEnd MySql)') {
+                steps {
+                    script {
+                        sh 'docker compose -f ${WORKSPACE}/Docker-compose.yml up -d'
+                    }
+                }
+            }
+
     post {
         always {
             archiveArtifacts artifacts: 'target/*.jar', allowEmptyArchive: true
