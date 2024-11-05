@@ -82,6 +82,12 @@ pipeline {
                                 sh "docker-compose up -d"
                             }
         }
+          stage('Grafana Setup') {
+                    steps {
+                        // Optionnel : Configurez ou redémarrez Grafana si nécessaire
+                        sh "docker restart grafana"
+                    }
+                }
 
     }
     post {
