@@ -11,6 +11,7 @@ pipeline {
         GIT_BRANCH = 'Firas_Univer'
         CREDENTIALS_ID = 'GitHub_Credentials'
         DOCKER_CREDENTIALS_ID = 'Docker_Credentials'
+        SONAR_TOKEN = credentials('sonar_token')
         DOCKER_IMAGE_NAME = 'firaskdidi/projetdevops'
         REMOTE_HOST = '192.168.50.4'   // VM IP address
         REMOTE_USER = 'vagrant'
@@ -59,6 +60,11 @@ pipeline {
                 sh 'mvn test'
             }
         }
+        stage('SonarQube Analysis') {
+                    steps {
+                        sh 'mvn sonar:sonar'
+                    }
+                }
 
         stage('Build Docker Image (Spring Part)') {
             steps {
