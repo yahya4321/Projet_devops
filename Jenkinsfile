@@ -97,7 +97,7 @@ pipeline {
                     subject: "Jenkins Pipeline Success: ${currentBuild.fullDisplayName}",
                     body: """<p>The Jenkins pipeline for <b>${env.JOB_NAME}</b> completed successfully.</p>
                              <p>Build URL: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>""",
-                    to: 'najjaradam668@gmail.com'
+                    to: 'adamabdelkader.najar@esprit.tn'
                 )
             }
 
@@ -107,7 +107,7 @@ pipeline {
                     subject: "Jenkins Pipeline Failure: ${currentBuild.fullDisplayName}",
                     body: """<p>The Jenkins pipeline for <b>${env.JOB_NAME}</b> failed.</p>
                              <p>Check the logs for more details: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>""",
-                    to: 'najjaradam668@gmail.com'
+                    to: 'adamabdelkader.najar@esprit.tn'
                 )
             }
         }
