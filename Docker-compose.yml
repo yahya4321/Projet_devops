@@ -29,7 +29,7 @@ services:
     image: prom/prometheus
     container_name: prometheus_container
     ports:
-      - "9092:9092"
+      - "9090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
 
